@@ -5,8 +5,11 @@ import java.lang.RuntimeException
 class StandardBooleanFormulaEvaluator : BooleanFormulaEvaluator {
     override fun eval(formula: BooleanFormula, values: Map<String, Boolean>): Boolean =
         when (formula) {
-            is And -> formula.values.fold(true, { acc, name -> acc && values.bool(name) })
-            is Or -> formula.values.fold(false, { acc, name -> acc || values.bool(name) })
+            is True -> true
+            is False -> false
+            is Variable -> values.bool(formula.name)
+            is And -> formula.values.fold(true, { acc, f -> acc && eval(f, values) })
+            is Or -> formula.values.fold(false, { acc, f -> acc || eval(f, values) })
             else -> throw RuntimeException("Unknown formula: $formula")
         }
 }
